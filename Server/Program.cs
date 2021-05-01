@@ -50,7 +50,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine("There was a problem starting a web server. Is server on port " + this.serverTCP.ToString() + " already running?\nError: " + ex.Message);
+                Console.WriteLine("There was a problem starting a web server. " + ex.Message);
                 Environment.Exit(1);
             }
         }
@@ -60,7 +60,17 @@ namespace Server
         /// </summary>
         private void StartListening()
         {
-            serverTCP.Start();
+            //We TRY to start the server. If we fail, that means that the coosen port is ocupied with another process.
+            try
+            {
+
+                serverTCP.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("There was a problem starting a web server.\n" + ex.Message);
+                Environment.Exit(1);
+            }
 
             try
             {
@@ -73,7 +83,7 @@ namespace Server
                     Console.WriteLine("Connected to IP: " + client.Client.RemoteEndPoint);
 
                     //Creates new thread for a client and starts it
-                    Thread t = new Thread(new ParameterizedThreadStart(HandleRequestTCP));
+                    Thread t = new Thread(new ParameterizedThreadStart(HandleRequest));
                     t.Start(client);
                 }
             }
@@ -89,7 +99,7 @@ namespace Server
         /// Method handles client's request
         /// </summary>
         /// <param name="obj">TcpClient in an object form</param>
-        public void HandleRequestTCP(object obj)
+        public void HandleRequest(object obj)
         {
             //Gets the client and the stream for the client
             TcpClient client = (TcpClient)obj;
@@ -128,6 +138,7 @@ namespace Server
                     Console.ForegroundColor = ConsoleColor.Blue;
                     System.Console.WriteLine("\nClient " + client.Client.RemoteEndPoint + " message: " + dataString + "\n");
                     Console.ResetColor();
+
                     //Here, we encode received text back to UTF-8 bytes
                     byte[] content = Encoding.UTF8.GetBytes(dataString);
 

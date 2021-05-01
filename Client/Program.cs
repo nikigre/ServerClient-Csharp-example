@@ -61,6 +61,7 @@ namespace Client
                     //When we are done with reading data, then we can get UTF-8 string from our memory stream
                     dataString = Encoding.UTF8.GetString(ms.ToArray(), 0, (int)ms.Length);
                 }
+
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\nServer message: " + dataString + "\n");
                 Console.ResetColor();
