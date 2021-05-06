@@ -24,7 +24,6 @@ namespace Server
         /// </summary>
         UdpClient serverUDP = null;
 
-        byte[] welcomeMessage = Encoding.UTF8.GetBytes("Wellcome client! :)");
 
         /// <summary>
         /// Creates a new instance of server
