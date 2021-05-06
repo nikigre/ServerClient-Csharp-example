@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "TCP\Server\Server
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "TCP\Client\Client.csproj", "{D262F93F-5757-43E5-A6E0-60B0474670B7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TCP", "TCP", "{AC54BA6D-5163-45D3-9128-7EE139A887E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A5A9956E-2529-4545-9C82-8C98AEE660E5} = {AC54BA6D-5163-45D3-9128-7EE139A887E6}
+		{D262F93F-5757-43E5-A6E0-60B0474670B7} = {AC54BA6D-5163-45D3-9128-7EE139A887E6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {98DEBCBC-4A26-4DA9-9741-758EC8DC9B04}
