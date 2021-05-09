@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,62 +10,54 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            UdpClient client = null;
+            UdpClient server = null;
+
             try
             {
                 //Connect to a server
-                client = new UdpClient("127.0.0.1", 200);
+                server = new UdpClient("127.0.0.1", 200);
             }
-            catch (Exception ex)
+            catch (Exception ex) //If we fail, that usualy means that port is ocupied by another process
             {
-                Console.WriteLine("There was a problem connecting to a remote server. Maybe it is offline?\nException: " + ex.Message);
+                Console.WriteLine("There was a problem connecting to a remote server.\nException: " + ex.Message);
                 Environment.Exit(1);
             }
 
             //New thread for printing data from server
             Thread t = new Thread(new ParameterizedThreadStart(WriteToConsole));
-            t.Start(client);
+            t.Start(server);
 
             while (true)
             {
+                //When user presses Enter, thig will hold entered text
                 string thing = System.Console.ReadLine();
 
-                //When we read a new line of text from console, we encode it to UTF-8,
+                //Converts entered text to bytes
                 byte[] thingByte = Encoding.UTF8.GetBytes(thing);
 
-
-                //and send all data to our server
-                client.Send(thingByte, thingByte.Length);
+                //Here we just send all bytes to our server
+                server.Send(thingByte, thingByte.Length);
             }
         }
 
         private static void WriteToConsole(object clientObject)
         {
-            //Gets the client and the stream for the client
+            //Gets the server object
             UdpClient sender = (UdpClient)clientObject;
 
-            IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            //This wariable will hold info about who sent a UDP packet.
+            //We can initialize it like this: sender = new IPEndPoint(IPAddress.Any, 0) or not. 
+            IPEndPoint iPEndPoint = null;
 
             try
             {
                 while (true)
                 {
-                    //This variable will contain text we got from client
-                    string dataString;
+                    //Here we wait for a UDP packet
+                    byte[] dataRead = sender.Receive(ref iPEndPoint);
 
-                    //data is our buffer
-                    byte[] data = new byte[1024];
-
-                    //We are using MemoryStream for saving recieved bytes which is muc easier to use that arrays
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-
-                        byte[] dataRead = sender.Receive(ref iPEndPoint);
-                        ms.Write(dataRead, 0, dataRead.Length);//We write all bytes from 0 to numBytesRead and save them in memory stream
-
-                        //When we are done with reading data, then we can get UTF-8 string from our memory stream
-                        dataString = Encoding.UTF8.GetString(ms.ToArray(), 0, (int)ms.Length);
-                    }
+                    //When we receive it, we can get string from byte array
+                    string dataString = Encoding.UTF8.GetString(dataRead, 0, dataRead.Length);
 
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine("\nServer message: " + dataString + "\n");
