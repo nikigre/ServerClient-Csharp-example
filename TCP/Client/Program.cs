@@ -11,12 +11,13 @@ namespace Client
         static void Main(string[] args)
         {
             TcpClient client = null;
+
             try
             {
                 //Connect to a server
                 client = new TcpClient("127.0.0.1", 200);
             }
-            catch (Exception ex)
+            catch (Exception ex) //If we fail, that means that port 200 is ocupied or server is not avalible
             {
                 Console.WriteLine("There was a problem connecting to a remote server. Maybe it is offline?\nException: " + ex.Message);
                 Environment.Exit(1);
@@ -26,17 +27,20 @@ namespace Client
             Thread t = new Thread(new ParameterizedThreadStart(WriteToConsole));
             t.Start(client);
 
+            //stream will be the variable for sending data to our server
             NetworkStream stream = client.GetStream();
 
             while (true)
             {
+                //When user presses Enter, thig will hold entered text
                 string thing = System.Console.ReadLine();
 
-                //When we read a new line of text from console, we encode it to UTF-8,
+                //Converts entered text to bytes
                 byte[] thingByte = Encoding.UTF8.GetBytes(thing);
 
+                //We check, if we have an active connection to our server.
                 if (client.Connected)
-                    //and send all data to our server
+                    //Here we send all bytes to our server.
                     stream.Write(thingByte, 0, thingByte.Length);
             }
         }
@@ -51,22 +55,27 @@ namespace Client
             {
                 while (true)
                 {
-                    //This variable will contain text we got from client
+                    //This variable will contain text we got from server
                     string dataString;
 
-                    //data is our buffer
+                    //data is our buffer. We could adjust the buffer size acording to how many data we would want to send/receive. Bur 1024 is okay for most communications
                     byte[] data = new byte[1024];
 
-                    //We are using MemoryStream for saving recieved bytes which is muc easier to use that arrays
+                    //We are using MemoryStream for saving recieved bytes which is much easier to use that arrays.
+                    //But we could use List<byte> for example. But MemoryStream is designed for dealing with buffers                    
                     using (MemoryStream ms = new MemoryStream())
                     {
                         //This int holds how many bytes we have read. It can be less than the data size
                         int numBytesRead;
 
+                        //We use do-while loop because we will read et lest once!
                         do
                         {
+                            //Read() returns how many bytes we have read. Data is saved into array data
                             numBytesRead = stream.Read(data, 0, data.Length);
-                            ms.Write(data, 0, numBytesRead);//We write all bytes from 0 to numBytesRead and save them in memory stream
+
+                            //We write all bytes from 0 to numBytesRead and save them into memory stream
+                            ms.Write(data, 0, numBytesRead);
 
                         } while (stream.DataAvailable); //If we have more bytes that our buffer, thet this is set to true!
 
@@ -85,7 +94,5 @@ namespace Client
                 Environment.Exit(1);
             }
         }
-
-
     }
 }

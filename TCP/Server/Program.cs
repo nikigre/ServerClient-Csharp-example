@@ -11,7 +11,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            //Create new server object
+            //Creates a new server object
             Server server = new Server(200);
 
             server.RunServer(); //We run our server
@@ -25,6 +25,9 @@ namespace Server
         /// </summary>
         TcpListener serverTCP = null;
 
+        /// <summary>
+        /// Wellcome message for every new client
+        /// </summary>
         byte[] welcomeMessage = Encoding.UTF8.GetBytes("Wellcome client! :)");
 
         /// <summary>
@@ -82,7 +85,7 @@ namespace Server
 
                     Console.WriteLine("Connected to IP: " + client.Client.RemoteEndPoint);
 
-                    //Creates new thread for a client and starts it
+                    //Creates a new thread for a client and starts it
                     Thread t = new Thread(new ParameterizedThreadStart(HandleRequest));
                     t.Start(client);
                 }
@@ -115,21 +118,26 @@ namespace Server
                     //This variable will contain text we got from client
                     string dataString;
 
-                    //data is our buffer
+                    //data is our buffer. We could adjust the buffer size acording to how many data we would want to send/receive. Bur 1024 is okay for most communications
                     byte[] data = new byte[1024];
 
-                    //We are using MemoryStream for saving recieved bytes which is muc easier to use that arrays
+                    //We are using MemoryStream for saving recieved bytes which is much easier to use that arrays.
+                    //But we could use List<byte> for example. But MemoryStream is designed for dealing with buffers
                     using (MemoryStream ms = new MemoryStream())
                     {
                         //This int holds how many bytes we have read. It can be less than the data size
                         int numBytesRead;
 
+                        //We use do-while loop because we will read et lest once!
                         do
                         {
+                            //Read() returns how many bytes we have read. Data is saved into array data
                             numBytesRead = stream.Read(data, 0, data.Length);
-                            ms.Write(data, 0, numBytesRead);//We write all bytes from 0 to numBytesRead and save them in memory stream
 
-                        } while (stream.DataAvailable); //If we have more bytes that our buffer, thet this is set to true!
+                            //We write all bytes from 0 to numBytesRead and save them into memory stream
+                            ms.Write(data, 0, numBytesRead);
+
+                        } while (stream.DataAvailable); //If we have more bytes that our buffer, then this is set to true!
 
                         //When we are done with reading data, then we can get UTF-8 string from our memory stream
                         dataString = Encoding.UTF8.GetString(ms.ToArray(), 0, (int)ms.Length);
