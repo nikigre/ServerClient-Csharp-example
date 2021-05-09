@@ -4,4 +4,4 @@ This project is a great start for understanding, how TCP/UDP communication works
 ## Remarks
 * If non-ASCII characters do not work, the problem is with the method Console.ReadLine() and not with client-server communication. Change command line encoding.
 * This is just a simple to understand implementation, and it may not be the most efficient.
-* Sorry for the typos in comments 😋
+* Sorry for the typos in the comments 😋
